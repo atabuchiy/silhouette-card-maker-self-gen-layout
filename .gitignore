@@ -19,3 +19,4 @@ data
 images/*.xcf
 
 hugo/public/
+.vscode/launch.json

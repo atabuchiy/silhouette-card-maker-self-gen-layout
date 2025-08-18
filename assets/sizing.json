@@ -1,0 +1,67 @@
+{
+    "ppi": 300,
+    "card_sizes": {
+        "standard": {
+            "width": "63mm",
+            "height": "88mm"
+        },
+        "standard_double": {
+            "width": "88mm",
+            "height": "126mm"
+        },
+        "japanese": {
+            "width": "59mm",
+            "height": "86mm"
+        },
+        "poker": {
+            "width": "2.5in",
+            "height": "3.5in"
+        },
+        "poker_half": {
+            "width": "1.75in",
+            "height": "2.5in"
+        },
+        "bridge": {
+            "width": "2.25in",
+            "height": "3.5in"
+        },
+        "bridge_square": {
+            "width": "2.25in",
+            "height": "2.25in"
+        },
+        "tarot": {
+            "width": "2.75in",
+            "height": "4.75in"
+        },
+        "domino": {
+            "width": "1.75in",
+            "height": "3.5in"
+        },
+        "domino_square": {
+            "width": "1.75in",
+            "height": "1.75in"
+        }
+    },
+    "paper_sizes": {
+        "letter": {
+            "width": "11in",
+            "height": "8.5in"
+        },
+        "tabloid": {
+            "width": "17in",
+            "height": "11in"
+        },
+        "a4": {
+            "width": "297mm",
+            "height": "210mm"
+        },
+        "a3": {
+            "width": "420mm",
+            "height": "297mm"
+        },
+        "archb": {
+            "width": "36in",
+            "height": "24in"
+        }
+    }
+}
