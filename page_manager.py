@@ -113,6 +113,16 @@ def generate_custom_layout(
         margin_x=min_margin
         space_x_px = 0
         available_width = min_available_width
+    else:
+        filled_height = card_height_px * num_rows + (2 * space_y_px) + (bleed_y_px * (num_rows - 1))
+        filled_width = card_width_px * num_cols + (2 * space_x_px) + (bleed_x_px * (num_cols - 1))
+        if 2 * bleed_x_px < available_width - filled_width:
+            margin_y=min_margin
+            available_height = min_available_height          
+        if 2 * bleed_y_px < available_height - filled_height:    
+            available_width = min_available_width
+            margin_x=min_margin
+            
         
     #Calculate max bleed and min space to registration marks
     filled_height = card_height_px * num_rows + (2 * space_y_px) + (bleed_y_px * (num_rows - 1))
@@ -147,9 +157,9 @@ def generate_custom_layout(
     
     #Generate template
     if orientation:
-        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}")
+        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}_{len(x_pos)}x{len(y_pos)}")
     else:
-        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}")
+        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}_{len(x_pos)}x{len(y_pos)}")
     
         
     card_sizes={}
@@ -162,7 +172,7 @@ def generate_custom_layout(
     card_layouts[card_size] = {
                                 "x_pos": x_pos,
                                 "y_pos": y_pos,
-                                "template": f"self_generated_{paper_size}_{card_size}"
+                                "template": f"self_generated_{paper_size}_{card_size}_{len(x_pos)}x{len(y_pos)}"
                             }
     paper_layouts={}
     paper_layouts[paper_size] = {

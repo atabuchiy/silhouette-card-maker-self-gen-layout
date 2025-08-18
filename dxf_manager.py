@@ -8,7 +8,7 @@ from typing import List
 output_directory = os.path.join('game', 'output')
 
 def add_rounded_rectangle(msp, x, y, width, height, radius):
-    #y=y-height #corner alignment
+    y=y-height #corner alignment
     # Define corner centers
     bl = (x + radius, y + radius)  # Bottom-left
     br = (x + width - radius, y + radius)  # Bottom-right
@@ -61,11 +61,11 @@ def generate_dxf(card_width: str, card_height: str, card_radius: str, x_pos: Lis
     for x in range(len(x_pos)):
         for y in range(len(y_pos)):
             if doc.units == units.IN:
-                pos_x = x_pos[x] / ppi
-                pos_y = y_pos[y] / ppi
+                pos_x = x_pos[x] / ppi 
+                pos_y = y_pos[y] / ppi * -1
             else:
-                pos_x = x_pos[x] * 25.4 / ppi
-                pos_y = y_pos[y] * 25.4 / ppi
+                pos_x = x_pos[x] * 25.4 / ppi 
+                pos_y = y_pos[y] * 25.4 / ppi * -1
             add_rounded_rectangle(msp, pos_x, pos_y, width, height, radius)
         
 
