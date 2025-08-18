@@ -7,7 +7,8 @@ from pathlib import Path
 import re
 from typing import Dict, List
 from xml.dom import ValidationErr
-from page_manager import generate_layout
+from page_manager import generate_layout, generate_reg_mark
+
 
 from natsort import natsorted
 from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageOps
@@ -408,7 +409,7 @@ def generate_pdf(
     ppi_ratio = ppi / 300
 
     # Load an image with the registration marks
-    with Image.open(registration_path) as reg_im:
+    with generate_reg_mark(paper_size) as reg_im:
         reg_im = reg_im.resize([math.floor(reg_im.width * ppi_ratio), math.floor(reg_im.height * ppi_ratio)])
 
         # Create the array that will store the filled templates

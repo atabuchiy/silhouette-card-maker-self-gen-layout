@@ -1,6 +1,7 @@
 import ezdxf
 import re
 import os
+import size_convert
 from ezdxf import units
 from typing import List
 
@@ -28,35 +29,24 @@ def add_rounded_rectangle(msp, x, y, width, height, radius):
     msp.add_arc(center=bl, radius=radius, start_angle=180, end_angle=270)  # Bottom-left
 
 
-
 # Create new DXF document
 def generate_dxf(card_width: str, card_height: str, card_radius: str, x_pos: List[int], y_pos: List[int], ppi:int, filename:str):
     doc = ezdxf.new(dxfversion='R2010')
-    
     float_pattern = r"(?:\d+\.\d*|\.\d+|\d+)"  # matches 1.0, .5, or 2
-    # Match mm
-    mm_width = re.fullmatch(rf"({float_pattern})mm", card_width)
-    mm_height = re.fullmatch(rf"({float_pattern})mm", card_height)
-    mm_radius = re.fullmatch(rf"({float_pattern})mm", card_radius)
-    if mm_width and mm_height and mm_radius:
-        doc.units = units.MM
-        width = float(mm_width.group(1))
-        height = float(mm_height.group(1))
-        radius = float(mm_radius.group(1))
-
-    # Match inches
+    # Match in or mm (default=mm)
     in_width = re.fullmatch(rf"({float_pattern})in", card_width)
-    in_height = re.fullmatch(rf"({float_pattern})in", card_width)
-    in_radius = re.fullmatch(rf"({float_pattern})mm", card_radius)
-    if in_width and in_height and in_radius:
+    if in_width:
         doc.units = units.IN
-        width = float(in_width.group(1))
-        height = float(in_height.group(1))
-        radius = float(in_radius.group(1))
-    
+        width = size_convert.size_to_in(card_width)
+        height = size_convert.size_to_in(card_height)
+        radius = size_convert.size_to_in(card_radius)
+    else:
+        doc.units = units.MM
+        width = size_convert.size_to_mm(card_width)
+        height = size_convert.size_to_mm(card_height)
+        radius = size_convert.size_to_mm(card_radius)
     
     msp = doc.modelspace()
-    
     
     for x in range(len(x_pos)):
         for y in range(len(y_pos)):

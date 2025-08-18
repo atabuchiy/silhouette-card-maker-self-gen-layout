@@ -1,10 +1,15 @@
 import json
 import math
 import os
-import re
 from types import SimpleNamespace
 from xml.dom import ValidationErr
 from dxf_manager import generate_dxf
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import matplotlib.lines as mlines
+from PIL import Image
+import io
+import size_convert
 
 # Specify directory locations
 sizing_path = os.path.join('assets', 'sizing.json')
@@ -39,6 +44,28 @@ def generate_layout(
                             sizing.ppi,
                             card_size,
                             paper_size)
+    
+def generate_reg_mark(
+    paper_size: str
+):
+    with open(sizing_path, 'r') as sizing_file:
+        try:
+            sizing = json.load(sizing_file, object_hook=lambda d: SimpleNamespace(**d))
+
+        except ValidationErr as e:
+            raise Exception(f'Cannot parse sizing.json: {e}.')
+        
+        # paper_layout represents the size of a paper and all possible card layouts
+        if not hasattr(sizing.paper_sizes, paper_size):
+            raise Exception(f'Unsupported paper size "{paper_size}". Try paper sizes: {sizing.paper_sizes.keys()}.')
+
+
+        return generate_custom_reg_mark(getattr(sizing.paper_sizes, paper_size).width,
+                                getattr(sizing.paper_sizes, paper_size).height,
+                                sizing.silhouette.inset, 
+                                sizing.silhouette.thickness, 
+                                sizing.silhouette.length, 
+                                sizing.ppi)
 
 
 def generate_custom_layout(
@@ -53,26 +80,26 @@ def generate_custom_layout(
     paper_size: str,
 ):
     #maximum bleed of 1mm and space to registration marks of 2mm
-    bleed_x_px = size_to_pixel("1mm", ppi)
+    bleed_x_px = size_convert.size_to_pixel("1mm", ppi)
     bleed_y_px = bleed_x_px
-    space_x_px = size_to_pixel("2mm", ppi)
+    space_x_px = size_convert.size_to_pixel("2mm", ppi)
     space_y_px = space_x_px
     
     #Page size to pixels
-    page_width_px = size_to_pixel(page_width, ppi)
-    page_height_px = size_to_pixel(page_height, ppi)
+    page_width_px = size_convert.size_to_pixel(page_width, ppi)
+    page_height_px = size_convert.size_to_pixel(page_height, ppi)
     
     #10mm min inset + 5mm length of silhouette at 300ppi
-    min_margin = size_to_pixel("10mm", ppi)
-    margin_x = size_to_pixel("15mm", ppi)
+    min_margin = size_convert.size_to_pixel("10mm", ppi)
+    margin_x = size_convert.size_to_pixel("15mm", ppi)
     margin_y = margin_x
     
     if orientation:
-        card_width_px = size_to_pixel(card_height, ppi)
-        card_height_px = size_to_pixel(card_width, ppi)
+        card_width_px = size_convert.size_to_pixel(card_height, ppi)
+        card_height_px = size_convert.size_to_pixel(card_width, ppi)
     else:
-        card_width_px = size_to_pixel(card_width, ppi)
-        card_height_px = size_to_pixel(card_height, ppi)
+        card_width_px = size_convert.size_to_pixel(card_width, ppi)
+        card_height_px = size_convert.size_to_pixel(card_height, ppi)
     
     available_width = page_width_px - (2 * (margin_x))
     available_height = page_height_px - (2 * (margin_y))
@@ -186,20 +213,74 @@ def generate_custom_layout(
     }
     
     
-def size_to_pixel(size_string, ppi):    
-    float_pattern = r"(?:\d+\.\d*|\.\d+|\d+)"  # matches 1.0, .5, or 2
-    
-    # Match mm
-    mm_match = re.fullmatch(rf"({float_pattern})mm", size_string)
-    if mm_match:
-        size_mm = float(mm_match.group(1))
-        return math.floor(size_mm / 25.4 * ppi)
+def generate_custom_reg_mark(paper_width:str, paper_height:str, inset:str, thickness:str, length:str, dpi:int):
+    # Paper size in mm
+    paper_width_mm = size_convert.size_to_mm(paper_width)
+    paper_height_mm = size_convert.size_to_mm(paper_height)
+    inset_mm = size_convert.size_to_mm(inset)
+    thickness_mm = size_convert.size_to_mm(thickness)
+    thickness_pt = size_convert.size_to_pt(thickness)
+    length_mm= size_convert.size_to_mm(length)
 
-    # Match inches
-    in_match = re.fullmatch(rf"({float_pattern})in", size_string)
-    if in_match:
-        size_in = float(in_match.group(1))
-        return math.floor(size_in*ppi)
+    # Create figure
+    fig = plt.figure(figsize=(paper_width_mm / 25.4, paper_height_mm / 25.4), dpi=dpi)
+    ax = fig.add_axes([0, 0, 1, 1])  # Use full canvas
+    ax.set_xlim(0, paper_width_mm)
+    ax.set_ylim(0, paper_height_mm)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.set_facecolor('white')
+
+    # Add filled black square (5x5mm at 10mm from left and bottom)
+    square = Rectangle(
+    (inset_mm, paper_height_mm - inset_mm - 5),       # (x, y) position in mm
+    5,              # width in mm
+    5,              # height in mm
+    facecolor='black',
+    edgecolor='black',
+    linewidth=thickness_pt
+    )
+    ax.add_patch(square)
+
+    # Horizontal line bottom-left
+    x_end = inset_mm + length_mm - (thickness_mm/2)
+    x_start = inset_mm
+    y_start = inset_mm  
+    y_end = inset_mm
+
+    line = mlines.Line2D([x_start, x_end], [y_start, y_end], color='black', linewidth=thickness_pt)
+    ax.add_line(line)
+
+
+    # Vertical line bottom left
+    x_end = inset_mm
+    x_start = inset_mm
+    y_start = inset_mm
+    y_end = inset_mm + length_mm - (thickness_mm/2)
+
+    line = mlines.Line2D([x_start, x_end], [y_start, y_end], color='black', linewidth=thickness_pt)
+    ax.add_line(line)
+
+
+    # Horizontal line top-right
+    x_end = paper_width_mm - inset_mm
+    x_start = x_end - length_mm + (thickness_mm/2)
+    y_start = paper_height_mm - inset_mm
+    y_end = paper_height_mm - inset_mm
+    line = mlines.Line2D([x_start, x_end], [y_start, y_end], color='black', linewidth=thickness_pt)
+    ax.add_line(line)
+
+    # Vertical line top-right
+    x_end = paper_width_mm - inset_mm
+    x_start = paper_width_mm - inset_mm
+    y_start = paper_height_mm - inset_mm 
+    y_end = y_start - length_mm + (thickness_mm/2)
+    line = mlines.Line2D([x_start, x_end], [y_start, y_end], color='black', linewidth=thickness_pt)
+    ax.add_line(line)
+
+    # Save output
     
-    #If no match
-    return math.floor(float(size_string))
+    img_buf = io.BytesIO()
+    plt.savefig(img_buf, format='jpg')
+    img_buf.seek(0)
+    return Image.open(img_buf)

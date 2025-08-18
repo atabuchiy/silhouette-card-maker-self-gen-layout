@@ -1,5 +1,10 @@
 {
     "ppi": 300,
+    "silhouette":{
+        "inset":"10mm", 
+        "thickness":"0.5mm", 
+        "length":"5mm"
+    },
     "card_sizes": {
         "standard": {
             "width": "63mm",
