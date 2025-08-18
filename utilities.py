@@ -402,9 +402,6 @@ def generate_pdf(
     if len(clean_skip_indices) == num_cards:
         raise Exception(f'You cannot skip all cards per page')
 
-    registration_filename =  f'{paper_size}_registration.png'
-    registration_path = os.path.join(asset_directory, registration_filename)
-
     # The baseline PPI is 300
     ppi_ratio = ppi / 300
 
