@@ -38,6 +38,7 @@ class PaperSize(str, Enum):
     A4 = "a4"
     A3 = "a3"
     ARCHB = "archb"
+    CUSTOM = "custom"
 
 class CardOrientation(str, Enum):
     VERTICAL = "vertical"
@@ -311,6 +312,11 @@ def generate_pdf(
     output_images: bool,
     card_size: CardSize,
     paper_size: PaperSize,
+    paper_width: str,
+    paper_height: str,
+    reg_mark_inset: str,
+    reg_mark_thickness: str,
+    reg_mark_length: str,
     card_orientation: CardOrientation,
     only_fronts: bool,
     crop_string: str | None,
@@ -368,9 +374,8 @@ def generate_pdf(
         if len(ds_set) > 0:
             raise Exception(f'Cannot use "--only_fronts" with double-sided cards. Remove cards from double-side image directory "{double_sided_dir_path}".')
 
-
     try:
-        layouts_data = generate_layout(card_size, paper_size, orientation_dict[card_orientation])
+        layouts_data = generate_layout(card_size, paper_size, orientation_dict[card_orientation], paper_width, paper_height, reg_mark_inset, reg_mark_thickness, reg_mark_length)
         layouts = Layouts(**layouts_data)
 
     except ValidationErr as e:
@@ -406,7 +411,7 @@ def generate_pdf(
     ppi_ratio = ppi / 300
 
     # Load an image with the registration marks
-    with generate_reg_mark(paper_size) as reg_im:
+    with generate_reg_mark(paper_size, paper_width, paper_height, reg_mark_inset, reg_mark_thickness, reg_mark_length) as reg_im:
         reg_im = reg_im.resize([math.floor(reg_im.width * ppi_ratio), math.floor(reg_im.height * ppi_ratio)])
 
         # Create the array that will store the filled templates

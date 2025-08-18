@@ -19,6 +19,11 @@ default_output_path = os.path.join(output_directory, 'game.pdf')
 @click.option("--output_images", default=False, is_flag=True, help="Create images instead of a PDF.")
 @click.option("--card_size", default=CardSize.STANDARD.value, type=click.Choice([t.value for t in CardSize], case_sensitive=False), show_default=True, help="The desired card size.")
 @click.option("--paper_size", default=PaperSize.LETTER.value, type=click.Choice([t.value for t in PaperSize], case_sensitive=False), show_default=True, help="The desired paper size.")
+@click.option("--paper_width", help="The desired paper width when --paper_size custom. Examples: 200mm, 7.9in")
+@click.option("--paper_height", help="The desired paper height when --paper_size custom. Examples: 400mm, 16in")
+@click.option("--reg_mark_inset", help="The desired registration mark inset. Examples: 10mm, 0.39in")
+@click.option("--reg_mark_thickness", help="The desired registration mark thickness. Examples: 1mm, 0.039in")
+@click.option("--reg_mark_length", help="The desired registration mark length. Examples: 5mm, 0.19in")
 @click.option("--card_orientation", default=CardOrientation.VERTICAL.value, type=click.Choice([t.value for t in CardOrientation], case_sensitive=False), show_default=True, help="The desired card orientation. Examples: Vertical, Horizontal")
 @click.option("--only_fronts", default=False, is_flag=True, help="Only use the card fronts, exclude the card backs.")
 @click.option("--crop", help="Crop the outer portion of front and double-sided images. Examples: 3mm, 0.125in, 6.5.")
@@ -38,6 +43,11 @@ def cli(
     output_images,
     card_size,
     paper_size,
+    paper_width,
+    paper_height,
+    reg_mark_inset,
+    reg_mark_thickness,
+    reg_mark_length,
     card_orientation,
     only_fronts,
     crop,
@@ -56,6 +66,11 @@ def cli(
         output_images,
         card_size,
         paper_size,
+        paper_width,
+        paper_height,
+        reg_mark_inset,
+        reg_mark_thickness,
+        reg_mark_length,
         card_orientation,
         only_fronts,
         crop,
