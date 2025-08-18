@@ -118,7 +118,7 @@ def generate_custom_layout(
     page_height_px = size_convert.size_to_pixel(page_height, ppi)
     
     #10mm min inset + 5mm length of silhouette at 300ppi + 1/2 thickness
-    min_margin = size_convert.size_to_pixel(inset, ppi) + math.floor(size_convert.size_to_pixel(thickness, ppi)/2)
+    min_margin = size_convert.size_to_pixel(inset, ppi)
     margin_x = size_convert.size_to_pixel(inset, ppi) + size_convert.size_to_pixel(length, ppi) + math.floor(size_convert.size_to_pixel(thickness, ppi)/2)
     margin_y = margin_x
     
