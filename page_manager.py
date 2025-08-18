@@ -85,12 +85,11 @@ def generate_custom_layout(
     max_num_rows = math.floor((min_available_height) / (card_height_px))
     max_num_cols = math.floor((min_available_width) / (card_width_px))
     
-    #Validate which margin is better to expand
-    filled_height = card_height_px * num_rows + (2 * space_y_px) + (bleed_y_px * (num_rows - 1))
-    filled_width = card_width_px * num_cols + (2 * space_x_px) + (bleed_x_px * (num_cols - 1))
-    
+    #Validate which margin to expand
     if num_rows<max_num_rows and num_cols<max_num_cols:
         #Expand side with biggest spare room (best bleed)
+        filled_height = card_height_px * num_rows + (2 * space_y_px) + (bleed_y_px * (num_rows - 1))
+        filled_width = card_width_px * num_cols + (2 * space_x_px) + (bleed_x_px * (num_cols - 1))
         if (filled_height - available_height) > (filled_width - available_width):
             num_rows=max_num_rows
             margin_y=min_margin
