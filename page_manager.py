@@ -212,11 +212,13 @@ def generate_custom_layout(
     custom_size = ""
     if paper_size=="custom":
         custom_size = f'({page_width}x{page_height})'
+    
+    orientation_text = "horizontal" if orientation else "vertical"
     #Generate template
     if orientation:
-        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}{custom_size}_{card_size}_{len(x_pos)}x{len(y_pos)}")
+        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
     else:
-        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}{custom_size}_{card_size}_{len(x_pos)}x{len(y_pos)}")
+        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
     
         
     card_sizes={}
@@ -229,7 +231,7 @@ def generate_custom_layout(
     card_layouts[card_size] = {
                                 "x_pos": x_pos,
                                 "y_pos": y_pos,
-                                "template": f"self_generated_{paper_size}{custom_size}_{card_size}_{len(x_pos)}x{len(y_pos)}"
+                                "template": f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}"
                             }
     paper_layouts={}
     paper_layouts[paper_size] = {
