@@ -4,6 +4,7 @@ import os
 import re
 from types import SimpleNamespace
 from xml.dom import ValidationErr
+from dxf_manager import generate_dxf
 
 # Specify directory locations
 sizing_path = os.path.join('assets', 'sizing.json')
@@ -31,6 +32,7 @@ def generate_layout(
 
     return generate_custom_layout( getattr(sizing.card_sizes, card_size).width, 
                             getattr(sizing.card_sizes, card_size).height, 
+                            getattr(sizing.card_sizes, card_size).radius, 
                             getattr(sizing.paper_sizes, paper_size).width,
                             getattr(sizing.paper_sizes, paper_size).height,
                             orientation,
@@ -42,6 +44,7 @@ def generate_layout(
 def generate_custom_layout(
     card_width: str,
     card_height: str,
+    card_radius: str,
     page_width: str,
     page_height: str,
     orientation: bool, #true=horizontal / false:vertical
@@ -141,7 +144,13 @@ def generate_custom_layout(
     
     for y in range(1, num_rows):  # fill remanining values
         y_pos.append(start_y + (y * (card_height_px + bleed_y_px)))
-        
+    
+    #Generate template
+    if orientation:
+        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}")
+    else:
+        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"self_generated_{paper_size}_{card_size}")
+    
         
     card_sizes={}
     card_sizes[card_size] = {
