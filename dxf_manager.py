@@ -4,7 +4,7 @@ import os
 import size_convert
 from ezdxf import units
 from typing import List
-
+import math
 
 output_directory = os.path.join('game', 'output')
 
@@ -27,6 +27,22 @@ def add_rounded_rectangle(msp, x, y, width, height, radius):
     msp.add_arc(center=tr, radius=radius, start_angle=0, end_angle=90)     # Top-right
     msp.add_arc(center=tl, radius=radius, start_angle=90, end_angle=180)   # Top-left
     msp.add_arc(center=bl, radius=radius, start_angle=180, end_angle=270)  # Bottom-left
+
+def add_rounded_rectangle_polyline(msp, x, y, width, height, radius):
+    y=-y-height #corner alignment
+    bulge = math.tan(math.radians(90 / 4))  # bulge for 90-degree arc ≈ 0.4142
+    raw_points = [
+        (x + width - radius, y, bulge),  # bottom-right arc
+        (x + width, y + radius),  # right side
+        (x + width, y + height - radius, bulge),  # top-right arc
+        (x + width - radius, y + height),  # top line
+        (x + radius, y + height, bulge),  # top-left arc
+        (x + 0, y + height - radius),  # left side
+        (x + 0, y + radius, bulge),  # bottom-left arc
+        (x + radius, y),  # bottom line
+    ] 
+
+    msp.add_polyline2d(raw_points, format="xyb", close=True)
 
 
 # Create new DXF document
@@ -56,7 +72,7 @@ def generate_dxf(card_width: str, card_height: str, card_radius: str, x_pos: Lis
             else:
                 pos_x = x_pos[x] * 25.4 / ppi 
                 pos_y = y_pos[y] * 25.4 / ppi
-            add_rounded_rectangle(msp, pos_x, pos_y, width, height, radius)
+            add_rounded_rectangle_polyline(msp, pos_x, pos_y, width, height, radius)
         
 
     # Save DXF
