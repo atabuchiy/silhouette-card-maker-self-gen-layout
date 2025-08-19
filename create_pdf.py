@@ -18,6 +18,9 @@ default_output_path = os.path.join(output_directory, 'game.pdf')
 @click.option("--output_path", default=default_output_path, show_default=True, help="The desired path to the output PDF.")
 @click.option("--output_images", default=False, is_flag=True, help="Create images instead of a PDF.")
 @click.option("--card_size", default=CardSize.STANDARD.value, type=click.Choice([t.value for t in CardSize], case_sensitive=False), show_default=True, help="The desired card size.")
+@click.option("--card_width", help="The desired card width when --card_size custom. Examples: 100mm, 4in")
+@click.option("--card_height", help="The desired card height when --card_size custom. Examples: 100mm, 4.7in")
+@click.option("--card_radius", help="The desired card radius when --card_size custom. Examples: 3mm, 0.2in")
 @click.option("--paper_size", default=PaperSize.LETTER.value, type=click.Choice([t.value for t in PaperSize], case_sensitive=False), show_default=True, help="The desired paper size.")
 @click.option("--paper_width", help="The desired paper width when --paper_size custom. Examples: 200mm, 7.9in")
 @click.option("--paper_height", help="The desired paper height when --paper_size custom. Examples: 400mm, 16in")
@@ -33,6 +36,7 @@ default_output_path = os.path.join(output_directory, 'game.pdf')
 @click.option("--load_offset", default=False, is_flag=True, help="Apply saved offsets. See `offset_pdf.py` for more information.")
 @click.option("--skip", type=click.IntRange(min=0), multiple=True, help="Skip a card based on its index. Useful for registration issues. Examples: 0, 4.")
 @click.option("--name", help="Label each page of the PDF with a name.")
+@click.option("--dxf", default=False, is_flag=True, help="Generate .dxf file for SS Studio. Enabled by default for custom paper size.")
 @click.version_option("1.4.0")
 
 def cli(
@@ -42,6 +46,9 @@ def cli(
     output_path,
     output_images,
     card_size,
+    card_width,
+    card_height,
+    card_radius,
     paper_size,
     paper_width,
     paper_height,
@@ -56,7 +63,8 @@ def cli(
     quality,
     skip,
     load_offset,
-    name
+    name,
+    dxf
 ):
     generate_pdf(
         front_dir_path,
@@ -65,6 +73,9 @@ def cli(
         output_path,
         output_images,
         card_size,
+        card_width,
+        card_height,
+        card_radius,
         paper_size,
         paper_width,
         paper_height,
@@ -79,7 +90,8 @@ def cli(
         quality,
         skip,
         load_offset,
-        name
+        name,
+        dxf
     )
 
 if __name__ == '__main__':

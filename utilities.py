@@ -31,6 +31,7 @@ class CardSize(str, Enum):
     TAROT = "tarot"
     DOMINO = "domino"
     DOMINO_SQUARE = "domino_square"
+    CUSTOM = "custom"
 
 class PaperSize(str, Enum):
     LETTER = "letter"
@@ -311,6 +312,9 @@ def generate_pdf(
     output_path: str,
     output_images: bool,
     card_size: CardSize,
+    card_width: str,
+    card_height: str,
+    card_radius: str,
     paper_size: PaperSize,
     paper_width: str,
     paper_height: str,
@@ -325,7 +329,8 @@ def generate_pdf(
     quality: int,
     skip_indices: List[int],
     load_offset: bool,
-    name: str
+    name: str,
+    dxf: bool
 ):
     # Sanity checks for the different directories
     f_path = Path(front_dir_path)
@@ -375,8 +380,10 @@ def generate_pdf(
             raise Exception(f'Cannot use "--only_fronts" with double-sided cards. Remove cards from double-side image directory "{double_sided_dir_path}".')
 
     try:
-        layouts_data = generate_layout(card_size, paper_size, orientation_dict[card_orientation], paper_width, paper_height, reg_mark_inset, reg_mark_thickness, reg_mark_length)
+        layouts_data = generate_layout(card_size, paper_size, orientation_dict[card_orientation], card_width, card_height, card_radius, paper_width, paper_height, reg_mark_inset, reg_mark_thickness, reg_mark_length, dxf)
         layouts = Layouts(**layouts_data)
+
+
 
     except ValidationErr as e:
         raise Exception(f'Cannot parse layouts.json: {e}.')

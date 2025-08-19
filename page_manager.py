@@ -19,11 +19,15 @@ def generate_layout(
     card_size: str,
     paper_size: str,
     orientation: bool, #true=horizontal / false:vertical
+    card_width: str = None,
+    card_height: str = None,
+    card_radius: str = None,
     paper_width: str = None,
     paper_height: str = None,
     inset: str = None, 
     thickness: str = None, 
     length: str = None, 
+    dxf: bool = False
 ):
     with open(sizing_path, 'r') as sizing_file:
         try:
@@ -32,13 +36,20 @@ def generate_layout(
         except ValidationErr as e:
             raise Exception(f'Cannot parse sizing.json: {e}.')
 
-        # card_layout_size represents the size of a card
-        if not hasattr(sizing.card_sizes, card_size):
-            raise Exception(f'Unsupported card size "{card_size}". Try card sizes: {sizing.card_sizes.keys()}.')
+        if card_size=="custom":
+            if card_width is None or card_height is None or card_radius is None:
+                raise Exception(f'Error: card_width and card_height and card_radius required for custom card size.')
+        else:
+            # card_layout_size represents the size of a card
+            if not hasattr(sizing.card_sizes, card_size):
+                raise Exception(f'Unsupported card size "{card_size}". Try card sizes: {sizing.card_sizes.keys()}.')
+            card_width = getattr(sizing.card_sizes, card_size).width
+            card_height = getattr(sizing.card_sizes, card_size).height
+            card_radius = getattr(sizing.card_sizes, card_size).radius
         
         if paper_size=="custom":
             if paper_width is None or paper_height is None:
-                raise Exception(f'Error: paper_width and paper_height required for Custom size.')
+                raise Exception(f'Error: paper_width and paper_height required for custom paper size.')
         else:
             # paper_layout represents the size of a paper and all possible card layouts
             if not hasattr(sizing.paper_sizes, paper_size):
@@ -46,9 +57,9 @@ def generate_layout(
             paper_width=getattr(sizing.paper_sizes, paper_size).width
             paper_height=getattr(sizing.paper_sizes, paper_size).height
 
-    return generate_custom_layout( getattr(sizing.card_sizes, card_size).width, 
-                            getattr(sizing.card_sizes, card_size).height, 
-                            getattr(sizing.card_sizes, card_size).radius, 
+    return generate_custom_layout(card_width, 
+                            card_height, 
+                            card_radius, 
                             paper_width,
                             paper_height,
                             orientation,
@@ -58,6 +69,7 @@ def generate_layout(
                             inset if inset is not None else sizing.silhouette.inset, 
                             thickness if thickness is not None else sizing.silhouette.thickness, 
                             length if length is not None else sizing.silhouette.length, 
+                            dxf
                             )
     
 def generate_reg_mark(
@@ -106,6 +118,7 @@ def generate_custom_layout(
     inset: str, 
     thickness: str, 
     length: str, 
+    dxf: bool
 ):
     #maximum bleed of 1mm and space to registration marks of 2mm
     bleed_x_px = size_convert.size_to_pixel("1mm", ppi)
@@ -210,16 +223,22 @@ def generate_custom_layout(
     for y in range(1, num_rows):  # fill remanining values
         y_pos.append(start_y + (y * (card_height_px + bleed_y_px)))
         
-    custom_size = ""
+    custom_paper_size = ""
     if paper_size=="custom":
-        custom_size = f'({page_width}x{page_height})'
+        custom_paper_size = f'({page_width}x{page_height})'
+        
+    custom_card_size = ""
+    if card_size=="custom":
+        custom_card_size = f'({card_width}x{card_height}R{card_radius})'
     
     orientation_text = "horizontal" if orientation else "vertical"
+    
     #Generate template
-    if orientation:
-        generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
-    else:
-        generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
+    if dxf:
+        if orientation:
+            generate_dxf(card_height, card_width, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_paper_size}_{card_size}{custom_card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
+        else:
+            generate_dxf(card_width, card_height, card_radius, x_pos, y_pos, ppi, f"{paper_size}{custom_paper_size}_{card_size}{custom_card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}")
     
         
     card_sizes={}
@@ -232,7 +251,7 @@ def generate_custom_layout(
     card_layouts[card_size] = {
                                 "x_pos": x_pos,
                                 "y_pos": y_pos,
-                                "template": f"{paper_size}{custom_size}_{card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}"
+                                "template": f"{paper_size}{custom_paper_size}_{card_size}{custom_card_size}_{orientation_text}_{len(x_pos)}x{len(y_pos)}"
                             }
     paper_layouts={}
     paper_layouts[paper_size] = {
