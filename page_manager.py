@@ -209,6 +209,7 @@ def generate_custom_layout(
     
     for y in range(1, num_rows):  # fill remanining values
         y_pos.append(start_y + (y * (card_height_px + bleed_y_px)))
+        
     custom_size = ""
     if paper_size=="custom":
         custom_size = f'({page_width}x{page_height})'

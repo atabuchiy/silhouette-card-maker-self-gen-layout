@@ -62,4 +62,4 @@ def generate_dxf(card_width: str, card_height: str, card_radius: str, x_pos: Lis
     # Save DXF
     default_output_path = os.path.join(output_directory, f'{filename}.dxf')
     doc.saveas(default_output_path)
-    print("DXF file 'template.dxf' created.")
+    print("Template DXF file created.")
