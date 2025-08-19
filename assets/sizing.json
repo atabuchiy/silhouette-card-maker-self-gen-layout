@@ -14,12 +14,12 @@
         "standard_double": {
             "width": "88mm",
             "height": "126mm",
-            "radius": "2.5mm"
+            "radius": "3mm"
         },
         "japanese": {
             "width": "59mm",
             "height": "86mm",
-            "radius": "2.5mm"
+            "radius": "3mm"
         },
         "poker": {
             "width": "2.5in",
@@ -34,27 +34,27 @@
         "bridge": {
             "width": "2.25in",
             "height": "3.5in",
-            "radius": "0.125in"
+            "radius": "3.5mm"
         },
         "bridge_square": {
             "width": "2.25in",
             "height": "2.25in",
-            "radius": "0.125in"
+            "radius": "3.5mm"
         },
         "tarot": {
             "width": "2.75in",
             "height": "4.75in",
-            "radius": "0.236in"
+            "radius": "6mm"
         },
         "domino": {
             "width": "1.75in",
             "height": "3.5in",
-            "radius": "0.1in"
+            "radius": "0.125in"
         },
         "domino_square": {
             "width": "1.75in",
             "height": "1.75in",
-            "radius": "0.1in"
+            "radius": "0.125in"
         }
     },
     "paper_sizes": {
